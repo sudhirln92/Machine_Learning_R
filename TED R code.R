@@ -1,14 +1,12 @@
 # Project Combined cycle power plant
 library("moments")  #skewness
 library("pastecs") #descriptive statistics stats.desc
-library("MASS")#fitting distribution
-library("fitdistrplus") #fitting distribution
 library("diptest")# Hartigans' dip test for unimodality 
 library("fmsb")#VIF
 library("DAAG")#K-fold validation
 
 #read the file
-setwd("/home/sudhir/Data science/Supervised machine learning/OLS")
+setwd("/home/sudhir/git/ML-R")
 data=read.csv("TED_OLS.csv",header=TRUE,na.string=c(" "))
 str(data)
 colnames(data)=c("Temperature","Exhaustvacuum","Pressure","Relativehumidity","Energy")
@@ -19,7 +17,6 @@ summary(is.na(data))#column wise summary
 table(is.na(data))#Total summary
 
 #outlier/uni variate analysis
-
 summary(data)# M.o.CT
 stat.desc(data)# M.o.CT +M.o.V
 
@@ -31,25 +28,25 @@ dip.test(data$Temperature)
 
 hist(data$Exhaustvacuum,col="red")
 boxplot(data$Exhaustvacuum,main="Exhaust Vacuum",col="red")
-plot(density(data$Exhaustvacuum))
+plot(density(data$Exhaustvacuum),col='brown')
 skewness(data$Exhaustvacuum)
 dip.test(data$Exhaustvacuum)
 
 boxplot(data$Pressure,main="Pressure",col="green")
 hist(data$Pressure,col="yellow")
-plot(density(data$Pressure))
+plot(density(data$Pressure),col='brown')
 skewness(data$Pressure)
 dip.test(data$Pressure)
 
 boxplot(data$Relativehumidity,main="Relative humidity",col="green")
 hist(data$Relativehumidity,col="green")
-plot(density(data$Relativehumidity))
+plot(density(data$Relativehumidity),col='brown')
 skewness(data$Relativehumidity)
 dip.test(data$Relativehumidity)
 
 boxplot(data$Energy,main="Energy",col="green")
 hist(data$Energy,col="brown")
-plot(density(data$Energy))
+plot(density(data$Energy),col='brown')
 skewness(data$Energy)
 dip.test(data$Energy)
 
@@ -58,24 +55,21 @@ c <- caret::BoxCoxTrans(data$Energy)
 print(c)
 data$newen=data$Energy^(-2)
 
-#Co-relation between IV and DV 
+#Co-relation between IV and DV
 cor(data)
 plot(data$Temperature,data$Energy,col=c("green","red"),main="Energy Vs. Temperature",font=10)
 plot(data$Exhaustvacuum,data$Energy,col=c("yellow","red"),main="Energy Vs. Exhaustvacuum",font=10)
 plot(data$Pressure,data$Energy,col=c("red","blue"),main="Energy Vs. Pressure",font=10)
 plot(data$Relativehumidity,data$Energy,col=c("black","red"),main="Energy Vs. Relativehumidity",font=10)
-pairs(data)
+pairs(data,col=c('red','blue'))
 
 #cross validation
 a=sample(nrow(data),nrow(data)*0.7)
 train=data[a,]
 test=data[-a,]
 
-
-
 #Model run/VIF check
-
-model1=lm(Energy~.,data=train)
+model1=lm(Energy~.,data=train[,-6])
 summary(model1)
 VIF(model1)
 model=lm(Energy~Pressure+Relativehumidity+Exhaustvacuum,data=train)
@@ -90,10 +84,10 @@ summary(model)
 VIF(model)
 
 #model validation in test
-
+test=test[,-5]
 pred=predict(model,test)
-SSE <- sum((test$Energy - pred) ^ 2)
-SST <- sum((test$Energy - mean(test$Energy)) ^ 2)
+SSE <- sum((test$newen - pred) ^ 2)
+SST <- sum((test$newen - mean(test$newen)) ^ 2)
 rsquare=1 - SSE/SST
 test$pred=pred
 rmse=(mean((test$Energy-test$pred)^2))^0.5
@@ -102,7 +96,7 @@ rmseTrain=(mean((train$Energy-model$fitted.values)^2))^0.5
 #Model Assumption Testing
 plot(fitted.values(model),resid(model),col=c("red","yellow"))#homoscedasticity
 
-L#Breusch-Pagan test for homoscedasticity
+#Breusch-Pagan test for homoscedasticity
 
 lmtest::bptest(model)
 
@@ -116,14 +110,13 @@ plot(train$Exhaustvacuum,resid(model),col=c("red","green"))#Linearity
 #Actual Vs. Fitted value
 plot(fitted.values(model),train$Energy,col=c("red","blue"),main="Actual value vs. Fitted value")#Actual Vs. fitted
 
-#######################################################################################
-# #Model validation
-
+# Model validation
 res = cv.lm(data=data, (form.lm =Energy~Pressure+Relativehumidity+Exhaustvacuum),m=5,dots=FALSE,seed=29, plotit = c("Observed", "Residual"), legend.pos="topleft")
 
-# #k fold summary
+##k fold summary
 k=5
-data$id <- sample(1:k, nrow(data1), replace = TRUE)
+data=data[,-6]
+data$id <- sample(1:k, nrow(data), replace = TRUE)
 list <- 1:k
 for(i in 1:k){
   trainset <- subset(data,id %in% list[-i])
@@ -138,4 +131,5 @@ for(i in 1:k){
  }
 
 # #Actual Vs. Fitted value
-plot(fitted.values(model),data$Energy,col=c("red","blue"),main="Actual value vs. Fitted value")#Actual Vs. fitted
+plot(fitted.values(model),data$Energy,col=c("red","blue"),main="Actual value vs. Fitted value")
+

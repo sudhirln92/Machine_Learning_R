@@ -1,0 +1,247 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Problem statement:
+
+Loading all required library
+```{r}
+library(moments) #skewness
+library(pastecs) #descriptive statistics stats.desc
+library(diptest) # Hartigans' dip test for unimodality 
+library(fmsb) #VIF
+library(DAAG) #K-fold validation
+library(ggplot2)
+```
+
+Data import
+Initial setwd command will set current working directory. The file in the format of csv(comma separated version) loaded to R in data.frame format.
+str command will give observation,data type, name, few sample of variables.
+
+Attribute Information:
+
+
+```{r}
+# data mining
+setwd("/home/sudhir/git/ML-R/OLS project/Cement")
+data=read.csv('train.csv')
+str(data)
+head(data)
+```
+
+Finding missing value "NA" using "is.na()".
+```{r}
+# Checking missing value
+summary(is.na(data)) # Column wise summary
+table(is.na(data)) # Total summary
+```
+
+Measure of central tendency of data.
+```{r}
+summary(data)# M.o.CT
+stat.desc(data)# M.o.CT +M.o.V
+```
+
+A boxplot provides a graphical view of the median, quartiles, maximum, and minimum of a data set. Outlier is an observation point that is distant from other observations.
+
+A histogram is a graphical representation of the distribution of numerical data. It is an estimate of the probability distribution of a continuous variable.To contruct histogram,the first step is to "bin" the range of values—that is, divide the entire range of values into a series of intervals—and then count how many values fall into each interval.
+
+plot(density(data$...) will give distribution of data
+
+Univariate analysis of "Cement" attribute
+```{r}
+new=data
+boxplot(new$Cement, ylab='Cement(Kg)', main='Cement Boxpolt',col = 'red' )
+hist(new$Cement, xlab='Cement(Kg)', main= 'Cement histogram', col='green')
+plot(density(new$Cement), xlab='Cement(Kg)', main= 'Cement Density plot', col='blue')
+skewness(new$Cement)
+dip.test(new$Cement)
+```
+
+Univariate analysis of "Slag(Kg)" attribute
+```{r}
+boxplot( new$Slag, ylab='Slag(Kg)', main='Slag Boxpolt',col = 'red' )
+hist(new$Slag, xlab='Slag(Kg)', main= 'Slag histogram', col='blue')
+plot(density(new$Slag), xlab='Slag(Kg)', main= 'Slag Density plot', col='darkgreen')
+skewness(new$Slag)
+dip.test(new$Slag)
+```
+
+Univariate analysis of "Ash(Kg)" attribute
+```{r}
+boxplot( new$Ash, ylab='Ash(Kg)', main='Ash Boxpolt',col = 'green' )
+hist(new$Ash, xlab='Ash(Kg)', main= 'Ash histogram', col='red')
+plot(density(new$Ash), xlab='Ash(Kg)', main= 'Ash Density plot', col='darkblue')
+skewness(new$Ash)
+dip.test(new$Ash)
+```
+
+Univariate analysis of "Water(Kg)" attribute
+```{r}
+boxplot( new$Water, ylab='Water(Kg)', main='Water Boxpolt',col = 'yellow' )
+hist(new$Water, xlab='Water(Kg)', main= 'Water histogram', col='blue')
+plot(density(new$Water), xlab='Water(Kg)', main= 'Water Density plot', col='purple')
+skewness(new$Water)
+dip.test(new$Water)
+```
+
+Univariate analysis of "Superplasticizer(Kg)" attribute
+```{r}
+boxplot( new$Superplasticizer, ylab='Superplasticizer(Kg)', main='Superplasticizer Boxpolt',col = 'green' )
+hist(new$Superplasticizer, xlab='Superplasticizer(Kg)', main= 'Superplasticizer histogram', col='brown')
+plot(density(new$Superplasticizer), xlab='Superplasticizer(Kg)', main= 'Superplasticizer Density plot', col='blue')
+skewness(new$Superplasticizer)
+dip.test(new$Superplasticizer)
+```
+
+Univariate analysis of "Coarse Aggregate(Kg)" attribute
+```{r}
+boxplot( new$CoarseAggregate, ylab='CoarseAggregate(Kg)', main='CoarseAggregate Boxpolt',col = 'red' )
+hist(new$CoarseAggregate, xlab='CoarseAggregate(Kg)', main= 'CoarseAggregate histogram', col='green')
+plot(density(new$CoarseAggregate), xlab='CoarseAggregate(Kg)', main= 'CoarseAggregate Density plot', col='yellow')
+skewness(new$CoarseAggregate)
+dip.test(new$CoarseAggregate)
+```
+
+Univariate analysis of "Fine Aggregate(Kg)" attribute
+```{r}
+boxplot( new$FineAggregate, ylab='FineAggregate(Kg)', main='FineAggregate Boxpolt',col = 'red' )
+hist(new$FineAggregate, xlab='FineAggregate(Kg)', main= 'FineAggregate histogram', col='yellow')
+plot(density(new$FineAggregate), xlab='FineAggregate(Kg)', main= 'FineAggregate Density plot', col='blue')
+skewness(new$FineAggregate)
+dip.test(new$FineAggregate)
+```
+
+Univariate analysis of "CompressiveStrength" attribute
+```{r}
+boxplot( new$CompressiveStrength, ylab='CompressiveStrength(Kg)', main='CompressiveStrength Boxpolt',col = 'red' )
+hist(new$CompressiveStrength, xlab='CompressiveStrength(Kg)', main= 'CompressiveStrength histogram', col='green')
+plot(density(new$CompressiveStrength), xlab='CompressiveStrength(Kg)', main= 'CompressiveStrength Density plot', col='red')
+skewness(new$CompressiveStrength)
+dip.test(new$CompressiveStrength)
+```
+
+Transformed output applying BOX COX tranfermation
+```{r}
+#library('caret')
+c<- caret:: BoxCoxTrans(new$CompressiveStrength)
+print(c)
+new$CompressiveStrength1=new$CompressiveStrength^0.5
+```
+
+Bivaraite analysis
+The covariance matrix generalizes the notion of variance to multiple dimensions.
+A scatter plot provides a graphical view of the relationship between two sets of attributes.
+Created new variable for Compressive Strength for Days (is factor) by mean. 
+```{r}
+cor(new[,-8])
+plot(new$Cement,new$CompressiveStrength1,col=c('red','green'),pch=16, xlab = 'Cement in (kG)',ylab = 'CompressiveStrength1 (Mpa)', main = 'Cement vs CompressiveStrength1')
+plot(new$Slag,new$CompressiveStrength1,col=c('blue','darkgreen'),pch=16, xlab = 'Slag in (kG)',ylab = 'CompressiveStrength (Mpa)', main = 'Slag vs CompressiveStrength')
+plot(new$Ash,new$CompressiveStrength1,col=c('red','green'),pch=16, xlab = 'Ash in (kG)',ylab = 'CompressiveStrength (Mpa)', main = 'Ash vs CompressiveStrength')
+plot(new$Water,new$CompressiveStrength1,col=c('blue','brown'),pch=16, xlab = 'Water in (kG)',ylab = 'CompressiveStrength (Mpa)', main = 'Water vs CompressiveStrength')
+plot(new$Superplasticizer,new$CompressiveStrength1,col=c('red','green'),pch=16, xlab = 'Superplasticizer in (kG)',ylab = 'CompressiveStrength (Mpa)', main = 'Superplasticizer vs CompressiveStrength')
+plot(new$CoarseAggregate,new$CompressiveStrength1,col=c('blue','darkgreen'),pch=16, xlab = 'CoarseAggregate in (kG)',ylab = 'CompressiveStrength (Mpa)', main = 'CoarseAggregate vs CompressiveStrength')
+plot(new$FineAggregate,new$CompressiveStrength1, col=c('red','purple'),pch=16, xlab='FineAggregate', ylab = 'CompressiveStrength',main='FineAggregate vs CompressiveStrength')
+
+ag=aggregate(new$CompressiveStrength1, by=list(new$Days),mean)
+ag
+pairs(new[,-8],col=c('blue','yellow'))
+```
+
+Data modeling
+lm function will give linear regression
+VIF is variance inflation factor
+```{r}
+# Building on train
+new=new[,-9]
+model=lm(CompressiveStrength1~., data=new)
+summary(model)
+VIF(model)
+new1=new[,-c(5,6,7)]
+model1=lm(CompressiveStrength1~., data=new1)
+summary(model1)
+VIF(model1)
+```
+
+Model validation
+R^2 will determine performation of model in predicted value.
+```{r}
+test=read.csv('test.csv')
+str(test)
+test$CompressiveStrength1=test$CompressiveStrength^0.5
+test=test[,-9]
+pred=predict(model1,test)
+sse=sum((pred-test$CompressiveStrength1)^2)
+sst=sum((test$CompressiveStrength1-mean(test$CompressiveStrength1))^2)
+e=(sse/sst)
+rsquare=1-e
+rsquare
+```
+
+```{r}
+#test
+plot(pred,test$CompressiveStrength1, main='test:Predicted vs Actual value', xlab = 'Predicted value',ylab = 'Actual value', col=c('blue','yellow'))
+#train
+plot(fitted.values(model1),new1$CompressiveStrength1, main='train: Predicted vs Actual value', xlab = 'Predicted value',ylab = 'Actual value', col=c('blue','yellow'))
+
+#Model assumption
+## Residual normality
+plot(density(resid(model1)), main= 'Residual model', col='red')
+skewness(resid(model1))
+qqnorm(resid(model1))
+qqline(resid(model1),col='red')
+# Residual homoscedasticity
+plot(fitted.values(model1),resid(model1),main='Fitted vs Residual value',xlab='fitted value',ylab='residual value', col=c('red','green'))
+
+```
+
+homoscedacit
+```{r}
+#Breuch pagan test for homoscedacity
+lmtest::bptest(model1)
+
+```
+
+Residual liniarity
+```{r}
+#Residual liniarity
+
+new1$resid=resid(model1)
+plot(new$Cement,resid(model1),xlab = 'Cement (kg)',ylab = 'Residual', main = 'Cement Residual linearity',col=c('blue','orange'))
+plot(new$Slag,resid(model1),xlab = 'Slag (kg)',ylab = 'Residual', main = 'Slag Residual linearity',col=c('red','purple'))
+plot(new$Ash,resid(model1),xlab = 'Ash (kg)',ylab = 'Residual', main = 'Ash Residual linearity',col=c('blue','orange'))
+plot(new$Water,resid(model1),xlab = 'Water (kg)',ylab = 'Residual', main = 'Water Residual linearity',col=c('green','purple'))
+plot(new$Superplasticizer,resid(model1),xlab = 'Superplasticizer (kg)',ylab = 'Residual', main = 'Superplasticizer Residual linearity',col=c('brown','orange'))
+plot(new$CoarseAggregate,resid(model1),xlab = 'CoarseAggregate (kg)',ylab = 'Residual', main = 'CoarseAggregate Residual linearity',col=c('red','yellow'))
+plot(new$FineAggregate,resid(model1),xlab = 'FineAggregate (kg)',ylab = 'Residual', main = 'FineAggregate Residual linearity',col=c('blue','orange'))
+plot(new$FineAggregate,resid(model1),xlab = 'FineAggregate (kg)',ylab = 'Residual', main = 'FineAggregate Residual linearity',col=c('red','purple'))
+
+# Model validation
+res = cv.lm(data=new, (form.lm =CompressiveStrength1~Cement+Slag+Ash+Water ),m=5,dots=FALSE,seed=29, plotit = c("Observed", "Residual"), legend.pos="topleft")
+
+
+```
+
+K fold summary
+```{r}
+#k fold summary
+k=5
+new$id <- sample(1:k, nrow(new), replace = TRUE)
+list <- 1:k
+for(i in 1:k){
+  trainset <- subset(new,id %in% list[-i])
+  testset <- subset(new,id %in% c(i))
+  model <- lm(trainset$CompressiveStrength1~trainset$Cement+trainset$Slag+trainset$Ash+trainset$Water)
+  predictions <- predict(model,testset[-c(4,5)])
+  a <- summary(model)
+   rmse <- sqrt(mean(model$residuals^2))
+   print(model$coefficients)
+   print(a$r.squared)
+   print(rmse)
+ }
+
+# #Actual Vs. Fitted value
+plot(fitted.values(model),new$CompressiveStrength1,col=c("red","blue"),main="Actual value vs. Fitted value")#Actual Vs. fitted
+```
+
