@@ -1,4 +1,4 @@
-# Credit card fraud detection
+# Credit card fraud detection detection
 library(pastecs)#descriptive stats
 library(moments)#skewness
 library(fmsb)#VIF
@@ -27,23 +27,151 @@ table(is.na(card))
 table(card$Class)
 
 # Univariate analysis
-plot(density(card$V1),xlab = 'V1',main="Credit card fraud",col='red')
-hist(card$V1,xlab = 'V1',main="Histogram of Credit card fraud",col='blue')
-boxplot(card$V1,xlab = 'V1',main="Boxplot of Credit card fraud",col='yellow')
+plot(density(card$V1),xlab = 'V1',main="Credit card fraud detection",col='red')
+hist(card$V1,xlab = 'V1',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V1,xlab = 'V1',main="Boxplot of Credit card fraud detection",col='yellow')
 skewness(card$V1)
 
-plot(density(card$V2),xlab = 'V2',main="Credit card fraud",col='blue')
-hist(card$V2,xlab = 'V2',main="Histogram of Credit card fraud",col='green')
-boxplot(card$V2,xlab = 'V2',main="Boxplot of Credit card fraud",col='yellow')
+plot(density(card$V2),xlab = 'V2',main="Credit card fraud detection",col='blue')
+hist(card$V2,xlab = 'V2',main="Histogram of Credit card fraud detection",col='green')
+boxplot(card$V2,xlab = 'V2',main="Boxplot of Credit card fraud detection",col='yellow')
 skewness(card$V2)
 
-plot(density(card$V3),xlab = 'V3',main="Credit card fraud",col='green')
-hist(card$V3,xlab = 'V3',main="Histogram of Credit card fraud",col='red')
+plot(density(card$V3),xlab = 'V3',main="Credit card fraud detection",col='green')
+hist(card$V3,xlab = 'V3',main="Histogram of Credit card fraud detection",col='red')
+boxplot(card$V3,xlab = 'V3',main="Boxplot of Credit card fraud detection",col='blue')
+skewness(card$V3)
+
+plot(density(card$V4),xlab = 'V4',main="Credit card fraud detection",col='brown')
+hist(card$V4,xlab = 'V4',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V4,xlab = 'V4',main="Boxplot of Credit card fraud detection",col='purple')
+skewness(card$V4)
+
+plot(density(card$V5),xlab = 'V5',main="Credit card fraud detection",col='red')
+hist(card$V5,xlab = 'V5',main="Histogram of Credit card fraud detection",col='yellow')
+boxplot(card$V5,xlab = 'V5',main="Boxplot of Credit card fraud detection",col='green')
+skewness(card$V5)
+
+plot(density(card$V6),xlab = 'V6',main="Credit card fraud detection",col='green')
+hist(card$V6,xlab = 'V6',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V6,xlab = 'V6',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V6)
+
+plot(density(card$V7),xlab = 'V7',main="Credit card fraud detection",col='green')
+hist(card$V7,xlab = 'V7',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V7,xlab = 'V7',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V7)
+
+plot(density(card$V8),xlab = 'V8',main="Credit card fraud detection",col='green')
+hist(card$V8,xlab = 'V8',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V8,xlab = 'V8',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V8)
+
+plot(density(card$V9),xlab = 'V9',main="Credit card fraud detection",col='green')
+hist(card$V9,xlab = 'V9',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V9,xlab = 'V9',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V9)
+
+plot(density(card$V10),xlab = 'V10',main="Credit card fraud detection",col='green')
+hist(card$V10,xlab = 'V10',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V10,xlab = 'V10',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V10)
+
+plot(density(card$V11),xlab = 'V11',main="Credit card fraud detection",col='green')
+hist(card$V11,xlab = 'V11',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V11,xlab = 'V11',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V11)
+
+plot(density(card$V12),xlab = 'V12',main="Credit card fraud detection",col='green')
+hist(card$V12,xlab = 'V12',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V12,xlab = 'V12',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V12)
+
+plot(density(card$V13),xlab = 'V13',main="Credit card fraud detection",col='green')
+hist(card$V13,xlab = 'V13',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V13,xlab = 'V13',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V13)
+
+plot(density(card$V14),xlab = 'V14',main="Credit card fraud detection",col='green')
+hist(card$V14,xlab = 'V14',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V14,xlab = 'V14',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V14)
+
+plot(density(card$V15),xlab = 'V15',main="Credit card fraud detection",col='green')
+hist(card$V15,xlab = 'V15',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V15,xlab = 'V15',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V15)
+
+plot(density(card$V16),xlab = 'V16',main="Credit card fraud detection",col='green')
+hist(card$V16,xlab = 'V16',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V16,xlab = 'V16',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V16)
+
+plot(density(card$V17),xlab = 'V17',main="Credit card fraud detection",col='green')
+hist(card$V17,xlab = 'V17',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V17,xlab = 'V17',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V17)
+
+plot(density(card$V18),xlab = 'V18',main="Credit card fraud detection",col='green')
+hist(card$V18,xlab = 'V18',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V18,xlab = 'V18',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V18)
+
+plot(density(card$V19),xlab = 'V19',main="Credit card fraud detection",col='green')
+hist(card$V19,xlab = 'V19',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V19,xlab = 'V19',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V19)
+
+plot(density(card$V20),xlab = 'V20',main="Credit card fraud detection",col='green')
+hist(card$V20,xlab = 'V20',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V20,xlab = 'V20',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V20)
+
+plot(density(card$V21),xlab = 'V21',main="Credit card fraud detection",col='green')
+hist(card$V21,xlab = 'V21',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V21,xlab = 'V21',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V21)
+
+plot(density(card$V22),xlab = 'V22',main="Credit card fraud detection",col='green')
+hist(card$V22,xlab = 'V22',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V22,xlab = 'V22',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V22)
+
+plot(density(card$V23),xlab = 'V23',main="Credit card fraud detection",col='green')
+hist(card$V23,xlab = 'V23',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V23,xlab = 'V23',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V23)
+
+plot(density(card$V24),xlab = 'V24',main="Credit card fraud detection",col='green')
+hist(card$V24,xlab = 'V24',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V24,xlab = 'V24',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V24)
+
+plot(density(card$V25),xlab = 'V25',main="Credit card fraud detection",col='green')
+hist(card$V25,xlab = 'V25',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V25,xlab = 'V25',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V25)
+
+plot(density(card$V26),xlab = 'V26',main="Credit card fraud detection",col='green')
+hist(card$V26,xlab = 'V26',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V26,xlab = 'V26',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V26)
+
+plot(density(card$V27),xlab = 'V27',main="Credit card fraud detection",col='green')
+hist(card$V27,xlab = 'V27',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V27,xlab = 'V27',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V27)
+
+plot(density(card$V28),xlab = 'V28',main="Credit card fraud detection",col='green')
+hist(card$V28,xlab = 'V28',main="Histogram of Credit card fraud detection",col='blue')
+boxplot(card$V28,xlab = 'V28',main="Boxplot of Credit card fraud detection",col='brown')
+skewness(card$V28)
 
 #Bivariate analysis
 
 
 # Model building
+ # Decision tree
 fit1=rpart(Class~.,method = 'class',data=card)
 summary(fit1)
 plot(fit1)
