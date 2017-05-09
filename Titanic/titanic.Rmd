@@ -1,0 +1,196 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document: default
+---
+OBJECTIVE:
+Prediction of likelihood of survival in Titanic shipwrecks.
+INTRODUCTION:
+Sinking of the RMS Titanic is one of the most infamous shipwrecks in history.  On April 15, 1912, during her maiden voyage, the Titanic sank after colliding with an iceberg, killing 1502 out of 2224 passengers and crew. This sensational tragedy shocked the international community and led to better safety regulations for ships.
+One of the reasons that the shipwreck led to such loss of life was that there were not enough lifeboats for the passengers and crew. Although there was some element of luck involved in surviving the sinking, some groups of people were more likely to survive than others, such as women, children, and the upper-class.In this challenge, we are doing the analysis of what sorts of people were likely to survive.
+SCOPE OF PROJECT:
+Using machine learning techniques we can predict the likelihood of survival in such major disaster, which can lead to have precautions in future ship events.  
+
+Loading all required library
+```{r}
+#Logistic Regression
+library(pastecs)#descriptive stats
+library(moments)#skewness
+library(fmsb)#VIF
+library(pscl)#R 2 of model
+library(caret)# confusion matrix
+library(e1071) # confusion matrix
+library(ROCR)# ROC curve
+```
+
+Data import
+Initial setwd command will set current working directory. The file in the format of csv(comma separated version) loaded to R in data.frame format.
+str command will give observation,data type, name, few sample of variables.
+
+We have taken historical data of 900 passengers along with several parameters which are given below.
+survivalSurvival
+(0 = No; 1 = Yes)
+pclass          Passenger Class(Socio-economic Status)
+(1 =uppear; 2 = middle; 3 = lower)
+nameName
+sexSex
+ageAge
+sibsp           Number of Siblings/Spouses Aboard
+parch           Number of Parents/Children Aboard
+ticketTicket Number
+fare            Passenger Fare
+cabinCabin
+embarked        Port of Embarkation (C=Cherbourg,Q=queenstown,S=Southampton)
+
+```{r}
+#/*reading the train file*/
+setwd('/home/sudhir/git/ML-R/Logistic regression/Titanic')
+titanic=read.csv("titanic_logistic rgression.csv",header=TRUE,na.string=c(""))
+titanic
+```
+
+Data exploration
+```{r}
+#/* Dropping insignificant variables  in the dataset*/
+
+data=names(titanic)%in%c("PassengerId","Cabin","Ticket","Name")
+titanic2=titanic[!data]
+titanic2
+str(titanic2)
+
+#/*structure of dataset*/
+str(titanic2)
+stat.desc(titanic2)
+titanic2$Pclass=as.factor(titanic2$Pclass)
+titanic2$Survived=as.factor(titanic2$Survived)
+str(titanic2)
+```
+
+Finding missing value "NA" using "is.na()".
+```{r}
+#/*Checking missing values in dataset*/
+table(is.na(titanic2))
+summary(is.na(titanic2))
+colSums(is.na(titanic2))
+
+#Note: cabin has 687 missing values,Age has 177 and Embarked has 2 missing values.
+
+#/*working with missing values*/
+colSums(is.na(titanic2))
+
+#Note: Age has 177 missing values,replacing values by mean
+titanic2$Age[is.na(titanic2$Age)]=mean(titanic2$Age,na.rm=TRUE)
+colSums(is.na(titanic2))
+titanic4=na.omit(titanic2)
+colSums(is.na(titanic4))
+str(titanic4)
+```
+
+A boxplot provides a graphical view of the median, quartiles, maximum, and minimum of a data set. Outlier is an observation point that is distant from other observations.
+
+A histogram is a graphical representation of the distribution of numerical data. It is an estimate of the probability distribution of a continuous variable.To contruct histogram,the first step is to "bin" the range of values—that is, divide the entire range of values into a series of intervals—and then count how many values fall into each interval.
+
+```{r}
+#/*outlier detetion*/
+skewness(titanic4$Age)
+hist(titanic4$Age,col.lab="blue",col="green")
+boxplot(titanic4$Age)
+
+skewness(titanic4$Fare)
+hist(titanic4$Fare,col.lab="blue",col="red",lty=4)
+boxplot(titanic4$Fare)
+titanic4=titanic4[which(titanic4$Fare<180),]
+skewness(titanic4$Fare)
+```
+
+
+```{r}
+#Skewness treatment/log transformation of Fare
+titanic4$lfare=log(titanic4$Fare)
+data=names(titanic4)%in%c("Fare")
+titanic5=titanic4[!(data)]
+str(titanic5)
+skewness(titanic5$lfare)
+```
+
+Bivariate analysis
+```{r}
+#/*corelation with o/p variable*/
+
+plot(titanic5$Survived,titanic5$Age)
+plot(titanic5$Survived,titanic5$lfare)
+
+#/*checking catagorical variable */
+contrasts(titanic5$Sex)
+contrasts(titanic5$Embarked)
+contrasts(titanic5$Pclass)
+```
+
+Data sampling
+```{r}
+#/*train and test dataset*/
+str(titanic5)
+table(titanic5$Survived)/nrow(titanic5)
+dt = sort(sample(nrow(titanic5), nrow(titanic5)*.7))
+train=titanic5[dt,]
+test=titanic5[-dt,]
+str(train)
+str(test)
+table(test$Survived)/nrow(test)
+table(train$Survived)/nrow(train)
+```
+
+Logistic regression
+```{r}
+#/*logistic regression*/
+model=glm(Survived~.,family=binomial(link='logit'),maxit=100,data=train)
+summary(model)
+
+#/*removing insignificant variables */
+
+model1=glm(Survived~Sex+Age+Pclass+SibSp,family=binomial(link='logit'),maxit=50,data=train)
+summary(model1)
+
+#checking multi-colinearity
+VIF(model1)
+```
+
+Model Validation
+```{r}
+#/*Predicting ability Accuracy on test dataset */
+str(test)
+newdata=subset(test,select=c(2,3,4,5))
+str(newdata)
+fittedresults=predict(model1,newdata,type='response')
+fittedresults1=ifelse(fittedresults>0.5,1,0)
+
+misclassifierror=mean(fittedresults1!=test$Survived)
+table(fittedresults1,test$Survived)
+print(paste('Accuracy',1-misclassifierror))
+```
+
+pR2 of model
+```{r}
+#/*R value*/
+pR2(model1)
+
+#/*Validation against  test  dataset*/
+#/*classification table/confusion matrix*/
+
+confusionMatrix(fittedresults1,test$Survived)
+```
+
+ROC
+```{r}
+#/*ROC curve*/
+pr = prediction(fittedresults, test$Survived)
+prf = performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+
+auc = performance(pr, measure = "auc")
+auc=auc@y.values[[1]]
+auc
+```
+
