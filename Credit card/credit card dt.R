@@ -8,6 +8,10 @@ library(ROCR)# ROC curve
 
 library(rpart) # Decision tree
 library(ROSE) # Imbalanced data
+library(rpart.plot) #Fancy plot
+library(RColorBrewer)
+library(rattle)
+
 
 # Data import
 setwd("/home/sudhir/R")
@@ -27,6 +31,11 @@ table(is.na(card))
 table(card$Class)
 
 # Univariate analysis
+plot(density(card$Time),xlab = 'Time',main="Credit card fraud detection",col='green')
+hist(card$Time,xlab = 'Time',main="Histogram of Credit card fraud detection",col='red')
+boxplot(card$Time,xlab = 'Time',main="Boxplot of Credit card fraud detection",col='yellow')
+skewness(card$Time)
+
 plot(density(card$V1),xlab = 'V1',main="Credit card fraud detection",col='red')
 hist(card$V1,xlab = 'V1',main="Histogram of Credit card fraud detection",col='blue')
 boxplot(card$V1,xlab = 'V1',main="Boxplot of Credit card fraud detection",col='yellow')
@@ -168,18 +177,19 @@ boxplot(card$V28,xlab = 'V28',main="Boxplot of Credit card fraud detection",col=
 skewness(card$V28)
 
 #Bivariate analysis
-
+library(ggplot2)
+ggplot(subset(card, Class %in% c("0","1")), aes(x=Class,y=V1,color=V2))+geom_point()
 
 # Model building
  # Decision tree
 fit1=rpart(Class~.,method = 'class',data=card)
-summary(fit1)
+fit1$cptable
 plot(fit1)
 text(fit1)
 
 # Model validation
-pred=predict(fit1,newdata=card)
-#confusionMatrix(pred,card$Class)
+pred=predict(fit1,newdata=card,type='class')
+confusionMatrix(pred,card$Class)
 
 # Handling imblanced data
  # Over sampling
@@ -215,4 +225,30 @@ roc.curve(card$Class, pred.tree.rose[,2])
 roc.curve(card$Class,pred.tree.over[,2])
 roc.curve(card$Class, pred.tree.both[,2])
 roc.curve(card$Class, pred.tree.under[,2])
+
+# Model works good for over sampling
+# lets split data train and test
+sp1=sample(nrow(data_over),nrow(data_over)*.7)
+train=data_over[sp1,]
+test=data_over[-sp1,]
+
+ # Model building
+model.dc.sp=rpart(Class~., data=train,method='class')
+model.dc.sp$cptable
+plot(model.dc.sp)
+text(model.dc.sp)
+fancyRpartPlot(model.dc.sp)
+
+#Pruning of tree
+prn.sp=prune(model.dc.sp, cp=model.dc.sp$cptable[which.min(model.dc.sp$cptable[,"xerror"]),"CP"])
+fancyRpartPlot(prn.sp)
+
+#Predicting the model
+pre.sp=predict(prn.sp,newdata = test,type = 'class')
+accuracy.sp=mean(pre.sp==test$Class)
+
+confusionMatrix(pre.sp,test$Class)
+
+pre.dp=predict(prn.sp,newdata = card,type = 'class')
+table(pre.dp)
 
