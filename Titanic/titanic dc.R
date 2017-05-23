@@ -122,6 +122,7 @@ accuracy_test=mean(pred==test$Survived)
 
 confusionMatrix(pred,test$Survived)
 
+submit
 
 
 

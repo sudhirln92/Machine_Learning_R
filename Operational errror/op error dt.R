@@ -17,6 +17,7 @@ setwd('/home/sudhir/Data science/Supervised machine learning/Logistic regression
 opdata=read.xlsx('Operational error.xlsx', sheetIndex = 1)
 str(opdata)
 stat.desc(opdata)
+table(opdata$Errors) # Imbalanced data
 
 #Data Preparation
 opdataMain=opdata
@@ -92,4 +93,30 @@ accuracy_test=mean(pred==test$Survived)
 
 confusionMatrix(pred,test$Survived)
 
+# Handling imbalanced data
+library(ROSE)
 
+#Over sampling
+dataover=ovun.sample(Errors1~.,method='over',data=opdata1)$data
+table(dataover$Errors1)
+
+#Under sampling
+dataunder=ovun.sample(Errors1~.,method = 'under',data=opdata1)$data
+table(dataunder$Errors1)
+
+#data balanced both
+databoth=ovun.sample(Errors1~.,method = 'both',data=opdata1)$data
+table(databoth$Error1)
+
+#data ROSE
+datarose=ROSE(Errors1~.,data=opdata1,seed=1)
+table(datarose$Error1)
+
+#Buid decision tree model
+dt.over=rpart(Errors1~.,method = 'class',data=dataover)
+dt.under=rpart(Errors1~.,method = 'class',data=dataunder)
+dt.both=rpart(Errors1~.,method = 'class',data = databoth)
+dt.rose=rpart(Errors1~.,method = 'class',data=datarose)
+
+#making prediction in unseen data
+pre_over=predict()

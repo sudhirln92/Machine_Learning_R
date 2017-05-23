@@ -1,6 +1,8 @@
 ---
-title: "R combined cycle power plant Project "
-output: html_notebook
+title: 'R combined cycle power plant Project '
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 Problem statement:
@@ -99,7 +101,7 @@ skewness(data$Energy)
 dip.test(data$Energy)
 ```
 
-Box cox transformation
+When data is not normally distributed, the cause for non-normality should be determined and appropriate remedial actions should be taken.Box cox transformation that may help to make data normal.
 ```{r}
 c <- caret::BoxCoxTrans(data$Energy)
 print(c)
@@ -168,7 +170,7 @@ Model assumption
 plot(fitted.values(model),resid(model),col=c("red","yellow"))#homoscedasticity
 
 #Breusch-Pagan test for homoscedasticity
-
+library(lmtest)
 lmtest::bptest(model)
 
 plot(density(resid(model)))#normality
