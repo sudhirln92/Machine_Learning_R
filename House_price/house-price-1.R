@@ -2,6 +2,7 @@
 library(ggplot2)
 library(dplyr)
 library(randomForest)
+library(lars)
 
 #Data import
 setwd("/home/sudhir/git/ML-R/House_price")
@@ -31,19 +32,49 @@ full$MasVnrArea[is.na(full$MasVnrArea)]=mean(full$MasVnrArea,na.rm =TRUE)
 table(is.na(full$GarageYrBlt))
 full$GarageYrBlt[is.na(full$GarageYrBlt)]=mean(full$GarageYrBlt,na.rm=TRUE)
 
+table(is.na(full$BsmtFinSF1))
+full$BsmtFinSF1[is.na(full$BsmtFinSF1)]=mean(full$BsmtFinSF1,na.rm=TRUE)
+
+table(is.na(full$BsmtFinSF2))
+full$BsmtFinSF2[is.na(full$BsmtFinSF2)]=mean(full$BsmtFinSF2,na.rm=TRUE)
+
+table(is.na(full$TotalBsmtSF))
+full$TotalBsmtSF[is.na(full$TotalBsmtSF)]=mean(full$TotalBsmtSF,na.rm=TRUE)
+
+table(is.na(full$BsmtFullBath))
+full$BsmtFullBath[is.na(full$BsmtFullBath)]=mean(full$BsmtFullBath,na.rm=TRUE)
+
+table(is.na(full$BsmtHalfBath))
+full$BsmtHalfBath[is.na(full$BsmtHalfBath)]=mean(full$BsmtHalfBath,na.rm=TRUE)
+
+table(is.na(full$BsmtUnfSF))
+full$BsmtUnfSF[is.na(full$BsmtUnfSF)]=mean(full$BsmtUnfSF,na.rm=TRUE)
+
+table(is.na(full$GarageCars))
+full$GarageCars[is.na(full$GarageCars)]=mean(full$GarageCars,na.rm=TRUE)
+
+table(is.na(full$GarageArea))
+full$GarageArea[is.na(full$GarageArea)]=mean(full$GarageArea,na.rm=TRUE)
+
+
 #Finding missing value in catagorical variable
 cat_var<-names(full)[which(sapply(full,is.factor))] 
 colSums(is.na(full[cat_var]))
 
-#Missing value present in this varaible in more than 90%, so we can ignore this variable
-summary(full$Alley)
-summary(full$PoolQC)
-summary(full$Fence)
-summary(full$MiscFeature)
+summary(full$MSZoning)
+full$MSZoning[is.na(full$MSZoning)]='RL'
 
-c('Alley','PoolQC','Fence','MiscFeature') #ignore
 summary(full$MasVnrType)
 full$MasVnrType[is.na(full$MasVnrType)]='None'
+
+summary(full$Utilities)
+full$Utilities[is.na(full$Utilities)]='AllPub'
+
+summary(full$Exterior1st)
+full$Exterior1st[is.na(full$Exterior1st)]='VinylSd'
+
+summary(full$Exterior2nd)
+full$Exterior2nd[is.na(full$Exterior2nd)]='VinylSd'
 
 summary(full$BsmtQual)
 full$BsmtQual[is.na(full$BsmtQual)]='Gd'
@@ -63,7 +94,6 @@ full$BsmtFinType2[is.na(full$BsmtFinType2)]='Unf'
 summary(full$Electrical)
 full$Electrical[is.na(full$Electrical)]='SBrkr'
 
-summary(full$FireplaceQu)
 
 summary(full$GarageType)
 full$GarageType[is.na(full$GarageType)]='Attchd'
@@ -77,19 +107,67 @@ full$GarageCond[is.na(full$GarageCond)]='TA'
 summary(full$GarageQual)
 full$GarageQual[is.na(full$GarageQual)]='TA'
 
-train1<-full[,-c(7,73,74,75)]
+summary(full$KitchenQual)
+full$KitchenQual[is.na(full$KitchenQual)]='TA'
 
-str(train1)
-train1$MSZoning<-as.integer(train1$MSZoning) 
-train1=as.data.frame(sapply(train1,as.integer,F)) 
+summary(full$Functional)
+full$Functional[is.na(full$Functional)]='Typ'
 
-table(is.na(full))
-#Apply principle component analysis
-pri.com<-prcomp(train1,scale=T,na.rm=T)
+summary(full$SaleType)
+full$SaleType[is.na(full$SaleType)]='WD'
 
-corr=cor(train1)
-plot(corr)
+summary(full$FireplaceQu)
+table(as.factor(full$Fireplaces), useNA = "ifany") 
+#Fireplaces is 
+levels(full$FireplaceQu)<-c(levels(full$FireplaceQu),'none')
+full$FireplaceQu[is.na(full$FireplaceQu)]<-rep('none')
 
 
-model=lm(SalePrice~.,data=train1,x=test)
+#Missing value present in this varaible in more than 90%, so we can ignore this variable
+summary(full$Alley)
+summary(full$PoolQC)
+summary(full$Fence)
+summary(full$MiscFeature)
+
+c('Alley','PoolQC','Fence','MiscFeature') #ignore
+
+colSums(is.na(full))
+
+full1=full[,-c(7,73,74,75)]
+
+
+for(i in 1:77){
+  if(is.factor(full1[,i])){
+    full1[,i]<-as.integer(full1[,i])
+  }
+}
+  
+train1=full1[1:1460,]
+test1=full1[1461:2919,1:76]
+
+train1$SalePrice=as.integer(train1$SalePrice)
+
+#Linear regression
+
+model=lm(SalePrice~.,data=train1)
 summary(model)
+
+model2=lm(formula = SalePrice ~ MSSubClass + LotArea + 
+            Condition2 + OverallQual + OverallCond + 
+            YearBuilt  + RoofMatl +  ExterQual + 
+            BsmtQual + BsmtCond + BsmtFinSF1 + BsmtFinSF2 + 
+            BsmtUnfSF + X1stFlrSF + X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + 
+            KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + 
+            GarageYrBlt + GarageCars +  SaleCondition, data=train1)
+summary(model2)
+prd=predict(model,test1)
+
+#Random forest
+rf.model=randomForest(SalePrice~.,data=train1,importance=T)
+plot(rf.model)
+
+rf.prd=predict(rf.model,test1)
+
+submit=data.frame(Id=test1$Id,SalePrice=rf.prd)
+write.csv(submit,'submithouseprice.csv',row.names = F)
+

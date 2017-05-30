@@ -14,7 +14,7 @@ library(rattle)
 
 
 # Data import
-setwd("/home/sudhir/R")
+setwd("/home/sudhir/R/Credit card fraud")
 #card=read.csv('creditcard.csv')
 card=readRDS('card.RDS')
 head(card)
@@ -251,4 +251,7 @@ confusionMatrix(pre.sp,test$Class)
 
 pre.dp=predict(prn.sp,newdata = card,type = 'class')
 table(pre.dp)
+
+submit=data.frame(Id=test$Id,Class=prd)
+write.csv(submit,'submitcard.csv',row.names = F)
 
