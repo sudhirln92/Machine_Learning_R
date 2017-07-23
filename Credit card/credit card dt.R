@@ -252,6 +252,6 @@ confusionMatrix(pre.sp,test$Class)
 pre.dp=predict(prn.sp,newdata = card,type = 'class')
 table(pre.dp)
 
-submit=data.frame(Id=test$Id,Class=prd)
+submit=data.frame(Class=pre.dp)
 write.csv(submit,'submitcard.csv',row.names = F)
 

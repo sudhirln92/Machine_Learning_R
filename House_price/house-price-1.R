@@ -1,8 +1,7 @@
 #House prices
 library(ggplot2)
-library(dplyr)
 library(randomForest)
-library(lars)
+library(caret)
 
 #Data import
 setwd("/home/sudhir/git/ML-R/House_price")
@@ -13,52 +12,55 @@ table(test$SalePrice)
 full<-rbind(train,test)
 str(full)
 
+numeric_var<-names(full)[which(sapply(full,is.numeric))]
+cat_var<-names(full)[which(sapply(full,is.factor))] 
+nzv<-nearZeroVar(full)
 
 #finding missing values 
 mis<-table(is.na(full))
 mis
 mis[2]*100/(nrow(full)*ncol(full))
 colSums(is.na(full))
-numeric_var<-names(full)[which(sapply(full,is.numeric))]
 colSums(is.na(full[,numeric_var]))
 
 #Replacing missing value with mean
 table(is.na(full$LotFrontage))
-full$LotFrontage[is.na(full$LotFrontage)]=mean(full$LotFrontage,na.rm =TRUE)
+full[sapply(full,is.numeric)]<-lapply(full[sapply(full,is.numeric)],function(x) ifelse(is.na(x),mean(x,na.rm=T),x))
 
-table(is.na(full$MasVnrArea))
-full$MasVnrArea[is.na(full$MasVnrArea)]=mean(full$MasVnrArea,na.rm =TRUE)
-
-table(is.na(full$GarageYrBlt))
-full$GarageYrBlt[is.na(full$GarageYrBlt)]=mean(full$GarageYrBlt,na.rm=TRUE)
-
-table(is.na(full$BsmtFinSF1))
-full$BsmtFinSF1[is.na(full$BsmtFinSF1)]=mean(full$BsmtFinSF1,na.rm=TRUE)
-
-table(is.na(full$BsmtFinSF2))
-full$BsmtFinSF2[is.na(full$BsmtFinSF2)]=mean(full$BsmtFinSF2,na.rm=TRUE)
-
-table(is.na(full$TotalBsmtSF))
-full$TotalBsmtSF[is.na(full$TotalBsmtSF)]=mean(full$TotalBsmtSF,na.rm=TRUE)
-
-table(is.na(full$BsmtFullBath))
-full$BsmtFullBath[is.na(full$BsmtFullBath)]=mean(full$BsmtFullBath,na.rm=TRUE)
-
-table(is.na(full$BsmtHalfBath))
-full$BsmtHalfBath[is.na(full$BsmtHalfBath)]=mean(full$BsmtHalfBath,na.rm=TRUE)
-
-table(is.na(full$BsmtUnfSF))
-full$BsmtUnfSF[is.na(full$BsmtUnfSF)]=mean(full$BsmtUnfSF,na.rm=TRUE)
-
-table(is.na(full$GarageCars))
-full$GarageCars[is.na(full$GarageCars)]=mean(full$GarageCars,na.rm=TRUE)
-
-table(is.na(full$GarageArea))
-full$GarageArea[is.na(full$GarageArea)]=mean(full$GarageArea,na.rm=TRUE)
+# full$LotFrontage[is.na(full$LotFrontage)]=mean(full$LotFrontage,na.rm =TRUE)
+# 
+# table(is.na(full$MasVnrArea))
+# full$MasVnrArea[is.na(full$MasVnrArea)]=mean(full$MasVnrArea,na.rm =TRUE)
+# 
+# table(is.na(full$GarageYrBlt))
+# full$GarageYrBlt[is.na(full$GarageYrBlt)]=mean(full$GarageYrBlt,na.rm=TRUE)
+# 
+# table(is.na(full$BsmtFinSF1))
+# full$BsmtFinSF1[is.na(full$BsmtFinSF1)]=mean(full$BsmtFinSF1,na.rm=TRUE)
+# 
+# table(is.na(full$BsmtFinSF2))
+# full$BsmtFinSF2[is.na(full$BsmtFinSF2)]=mean(full$BsmtFinSF2,na.rm=TRUE)
+# 
+# table(is.na(full$TotalBsmtSF))
+# full$TotalBsmtSF[is.na(full$TotalBsmtSF)]=mean(full$TotalBsmtSF,na.rm=TRUE)
+# 
+# table(is.na(full$BsmtFullBath))
+# full$BsmtFullBath[is.na(full$BsmtFullBath)]=mean(full$BsmtFullBath,na.rm=TRUE)
+# 
+# table(is.na(full$BsmtHalfBath))
+# full$BsmtHalfBath[is.na(full$BsmtHalfBath)]=mean(full$BsmtHalfBath,na.rm=TRUE)
+# 
+# table(is.na(full$BsmtUnfSF))
+# full$BsmtUnfSF[is.na(full$BsmtUnfSF)]=mean(full$BsmtUnfSF,na.rm=TRUE)
+# 
+# table(is.na(full$GarageCars))
+# full$GarageCars[is.na(full$GarageCars)]=mean(full$GarageCars,na.rm=TRUE)
+# 
+# table(is.na(full$GarageArea))
+# full$GarageArea[is.na(full$GarageArea)]=mean(full$GarageArea,na.rm=TRUE)
 
 
 #Finding missing value in catagorical variable
-cat_var<-names(full)[which(sapply(full,is.factor))] 
 colSums(is.na(full[cat_var]))
 
 summary(full$MSZoning)
@@ -135,6 +137,7 @@ colSums(is.na(full))
 
 full1=full[,-c(7,73,74,75)]
 
+#full1[]<-lapply(full1,as.numeric)
 
 for(i in 1:77){
   if(is.factor(full1[,i])){
@@ -160,14 +163,33 @@ model2=lm(formula = SalePrice ~ MSSubClass + LotArea +
             KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + 
             GarageYrBlt + GarageCars +  SaleCondition, data=train1)
 summary(model2)
-prd=predict(model,test1)
+#prd=predict(model,test1)
 
 #Random forest
 rf.model=randomForest(SalePrice~.,data=train1,importance=T)
-plot(rf.model)
+summary(rf.model)
+#plot(rf.model)
+rf.prd<-predict(rf.model,test1)
 
-rf.prd=predict(rf.model,test1)
+#submit=data.frame(Id=test1$Id,SalePrice=rf.prd)
+#write.csv(submit,'submithouseprice.csv',row.names = F)
+confusionMatrix(rf.model,test1)
 
-submit=data.frame(Id=test1$Id,SalePrice=rf.prd)
+#gbm
+library(gbm)
+
+model <- gbm(SalePrice ~., data = train1, distribution = "gaussian",
+             shrinkage = 0.05,
+             interaction.depth = 12,
+             #bag.fraction = 0.6,
+             #n.minobsinnode = 1,
+             #cv.folds = 1,
+             keep.data = F,
+             verbose = F,
+             n.trees = 200)
+predict <- predict(model, test1, n.trees = 200)
+submit=data.frame(Id=test1$Id,SalePrice=predict)
 write.csv(submit,'submithouseprice.csv',row.names = F)
+
+confusionMatrix(model,test1)
 
