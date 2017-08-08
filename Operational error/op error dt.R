@@ -87,6 +87,7 @@ plot(ptree)
 
 #Accuracy
 pred=predict(ptree,test,type = "class")
+pred 
 accuracy_test=mean(pred==test$Survived)
 
 #/*classification table/confusion matrix*/
@@ -104,7 +105,7 @@ table(dataover$Errors1)
 dataunder=ovun.sample(Errors1~.,method = 'under',data=opdata1)$data
 table(dataunder$Errors1)
 
-#data balanced both
+#data balanced sampling both
 databoth=ovun.sample(Errors1~.,method = 'both',data=opdata1)$data
 table(databoth$Error1)
 

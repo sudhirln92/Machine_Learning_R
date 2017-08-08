@@ -14,6 +14,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #Importing Data set 
+import os
+os.chdir('/home/sudhir/git/ML-R/Titanic')
 train = pd.read_csv('train.csv')
 test = pd.read_csv('test.csv')
 train.shape #Number of col & row
@@ -43,17 +45,13 @@ dataset.isnull().sum()
 #Replacing missing value
 dataset.Embarked.value_counts()
 dataset['Embarked'] = dataset['Embarked'].fillna('S')
-
 dataset['Age']=dataset.Age.fillna(dataset.Age.mean())
-
 dataset.Fare=dataset.Fare.fillna(dataset.Fare.mean())
-
 dataset.drop(['Name','Cabin','Ticket'],inplace =True,axis=1)
 
 #Data set 
 dataset.hist(figsize=(9,9),grid=1)
 dataset.boxplot()
-
 
 #Conver Character variable to Numeric
 from sklearn.preprocessing import LabelEncoder
