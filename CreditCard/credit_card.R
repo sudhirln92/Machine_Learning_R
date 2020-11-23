@@ -15,8 +15,8 @@ library(rattle)
 
 # Data import
 setwd("/home/sudhir/R/Credit card fraud")
-#card=read.csv('creditcard.csv')
-card=readRDS('card.RDS')
+card=read.csv('creditcard.csv')
+# card=readRDS('card.RDS')
 head(card)
 str(card)
 card$Class=as.factor(card$Class)
