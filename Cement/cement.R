@@ -6,8 +6,8 @@ library('ggplot2')
 library('diptest') # dip test for unimodality
 
 # data mining
-setwd("/home/sudhir/Data science/Supervised machine learning/OLS/project 1")
-data=read.csv('train.csv')
+setwd("/home/sudhir/git/machine-learning-in-R")
+data=read.csv('Cement/input/train.csv')
 # Checking missing value
 table(is.na(data))
 str(data)
